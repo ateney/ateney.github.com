@@ -14,3 +14,13 @@
 ## 残タスク
 - ボタン（規約関連のUI）
 - ログ排出機能
+
+## セキュリティメモ（2026-10-05）
+- JWTのlocalStorage平文保存は廃止した（auth.js）。AES-GCM暗号化 + IndexedDBの非抽出可能鍵。
+  localStorageを丸ごと盗まれてもトークンの平文は復元できない。旧平文トークンは初回読み込み時に自動移行＆削除。
+- ateney-user には UI表示に必要な最小限（name/id/provider）だけ置く。email等は保存しない。
+- CSP (meta) を全ページに追加。script-src の unsafe-inline はインラインスクリプト前提のため暫定許可。
+  外部originのスクリプト読込は禁止済み。Worker移転時は connect-src の workers.dev を更新すること。
+- create ページは API が 401 を返したら認証情報を掃除して再ログインに誘導する。
+- 本気でさらに固くするなら: ateney-api 側で HttpOnly Cookie 化（静的サイトでは不可能なため Worker作業）。
+  あとインラインスクリプトを全部外部ファイル化すれば CSP の unsafe-inline を外せる。
